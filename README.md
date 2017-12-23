@@ -2,7 +2,10 @@
 
 ## About
 This is a tiny program that scrapes and downloads images from 
-NOAA's GOES east satellite. As of December 18, 2017 GOES east 
+NOAA's GOES east satellite. As of December 18, 2017, GOES-13 has
+been retired from the GOES east position and been replaced with
+GOES-16. This program is an updated version of [GOES-13](https://github.com/n9Mtq4/NOAA-Goes-13-image-scraper)
+that works with GOES-16.
 The point of this project is to be able to keep a locally
 stored database of these images, so you can look back further than
 the ~44 image limit of the online directory list.
