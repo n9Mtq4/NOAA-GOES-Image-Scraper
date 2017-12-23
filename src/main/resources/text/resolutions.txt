@@ -1,0 +1,9 @@
+Possible values for resolutions
+
+Resolutions     Bands
+339x339         all
+678x678         all
+1808x1808       all
+5424x5424       all
+10848x10848     GeoColor, 1-3, 5
+21696x21696     2

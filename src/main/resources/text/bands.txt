@@ -1,0 +1,20 @@
+Possible values for bands
+
+Band        Description
+GeoColor    True Color daytime, multispectral IR at night
+1           0.47 µm, Blue - Visible
+2           0.64 µm, Red - Visible
+3           0.86 µm, Veggie - Near IR
+4           1.37 µm, Cirrus - Near IR
+5           1.60 µm, Snow/Ice - Near IR
+6           2.20 µm, Cloud Particle - Near IR
+7           3.90 µm, Shortwave Window - IR
+8           6.20 µm, Upper-Level Water Vapor - IR 
+9           6.90 µm, Mid-Level Water Vapor - IR 
+10          7.30 µm, Lower-level Water Vapor - IR
+11          8.40 µm, Cloud Top - IR
+12          9.60 µm, Ozone - IR
+13          10.3 µm, Clean Longwave Window - IR
+14          11.2 µm, Longwave Window - IR
+15          12.3 µm, Dirty Longwave Window - IR
+16          13.3 µm, CO2 Longwave - IR

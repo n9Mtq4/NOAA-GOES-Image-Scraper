@@ -1,0 +1,71 @@
+buildscript {
+    ext.kotlin_version = '1.2.10'
+    
+    repositories {
+        mavenCentral()
+        flatDir dirs: proguard_dir
+    }
+    dependencies {
+        classpath "org.jetbrains.kotlin:kotlin-gradle-plugin:$kotlin_version"
+        classpath ':proguard:'
+    }
+}
+
+group 'NOAA-Goes-16-Image-Scraper'
+version '1.0-SNAPSHOT'
+
+apply plugin: 'java'
+apply plugin: 'kotlin'
+apply plugin: 'application'
+
+sourceCompatibility = 1.8
+mainClassName = "com.n9mtq4.goes16scraper.Scraper"
+
+repositories {
+    mavenCentral()
+    jcenter()
+    maven { url 'https://jitpack.io' }
+}
+
+dependencies {
+    compile "org.jetbrains.kotlin:kotlin-stdlib-jdk8:$kotlin_version"
+    compile "org.jetbrains.kotlinx:kotlinx-coroutines-jdk8:0.20"
+    compile "commons-cli:commons-cli:1.2"
+    compile "org.jsoup:jsoup:1.11.2"
+    compile "com.google.code.gson:gson:2.8.2"
+    testCompile group: 'junit', name: 'junit', version: '4.12'
+}
+
+compileKotlin {
+    kotlinOptions.jvmTarget = "1.8"
+}
+
+compileTestKotlin {
+    kotlinOptions.jvmTarget = "1.8"
+}
+
+jar {
+    manifest {
+        attributes 'Main-Class': mainClassName
+    }
+    from { configurations.compile.collect { it.isDirectory() ? it : zipTree(it) } }
+}
+
+task proguard(type: proguard.gradle.ProGuardTask) {
+    
+    configuration 'proguard.txt'
+    
+    libraryjars "${System.getProperty('java.home')}/lib/rt.jar"
+    
+    injars "build/libs/${project.getName()}-${project.getVersion()}.jar"
+    outjars "build/libs/${project.getName()}-${project.getVersion()}-proguard.jar"
+    
+}
+
+// experimental coroutines warning removal
+// should be included until corroutines are finalized
+kotlin {
+    experimental {
+        coroutines 'enable'
+    }
+}
