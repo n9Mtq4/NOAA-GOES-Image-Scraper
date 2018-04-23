@@ -1,17 +1,17 @@
 package com.n9mtq4.goes16scraper
 
 import com.n9mtq4.goes16scraper.utils.getTimestamp
-import kotlinx.coroutines.experimental.async
+import kotlinx.coroutines.experimental.launch
 import kotlinx.coroutines.experimental.runBlocking
 import org.json.simple.JSONArray
 import org.json.simple.JSONObject
 import org.json.simple.parser.JSONParser
 import org.jsoup.Jsoup
 import java.io.File
-import java.io.FileNotFoundException
 import java.io.FileOutputStream
 import java.net.URL
 import java.nio.channels.Channels
+import java.util.concurrent.atomic.AtomicInteger
 
 /**
  * Created by will on 12/22/2017 at 7:19 PM.
@@ -79,10 +79,6 @@ class WeatherWorker(private val sleepTime: Long, private val checkSleepTime: Lon
 			val jsonUrl = urlStr + "catalog.json"
 			println(jsonUrl)
 			
-//			SSLWorkaround.enableSSLSocket()
-			
-			// read catalog.json to figure out what images there are
-			// TODO: remove jsoup dependency?
 			val jsonStr = Jsoup
 					.connect(jsonUrl)
 					.header("Accept-Encoding", "gzip, deflate, br")
@@ -102,41 +98,44 @@ class WeatherWorker(private val sleepTime: Long, private val checkSleepTime: Lon
 			
 			val imageUrlList = imageList.map { it to urlStr + it }
 			
-			val totalSize = imageUrlList.size
-			var failed = 0
-			var alreadyDownloaded = 0
-			var success = 0
+			downloadAll(imageUrlList)
 			
-			imageUrlList.divideIntoGroupsOf(5).forEach { smallImageList ->
-				runBlocking {
-					
-					smallImageList.map { (name, url) ->
-						async {
-							try {
-								downloadImage(name, url)
-								success++
-							}catch (ade: AlreadyDownloadedException) {
-								alreadyDownloaded++
-							}catch (fnfe: FileNotFoundException) {
-								println("Can't find: $name at $url")
-								failed++
-							}catch (e: Exception) {
-								e.printStackTrace()
-								failed++
-							}
-						}
-					}.forEach { it.await() }
-					
-				}
-			}
-			
-			println("Downloaded $success/$totalSize, already had $alreadyDownloaded, failed $failed")
-			println("Image download done!")
 			
 		} catch (e: Exception) {
 			println("Error downloading the images! Will try again at ${getTimestamp(sleepTime)}. (${e.localizedMessage})")
 			e.printStackTrace()
 		}
+		
+	}
+	
+	private fun downloadAll(imageUrls: List<Pair<String, String>>) { 
+		
+		val totalSize = imageUrls.size
+		val failed = AtomicInteger(0)
+		val alreadyDownloaded = AtomicInteger(0)
+		val succeeded = AtomicInteger(0)
+		
+		// download in asynchronously in groups of 5
+		imageUrls.divideIntoGroupsOf(5).forEach { imgBatchGroup ->
+			
+			runBlocking { 
+				
+				imgBatchGroup.map { (name, url) -> launch {
+					try {
+						downloadImage(name, url)
+						succeeded.incrementAndGet()
+					}catch (e: AlreadyDownloadedException) {
+						alreadyDownloaded.incrementAndGet()
+					}catch (e: Exception) {
+						failed.incrementAndGet()
+					}
+				} }.forEach { it.join() }
+				
+			}
+			
+		}
+		
+		println("New: $succeeded, AlreadyHad: $alreadyDownloaded, Failed: $failed, Total: $totalSize")
 		
 	}
 	
@@ -152,7 +151,6 @@ class WeatherWorker(private val sleepTime: Long, private val checkSleepTime: Lon
 		return o.toList()
 		
 	}
-	
 	
 	/**
 	 * checks to make sure that the file system is allowing us to read and write the required directories
@@ -188,7 +186,7 @@ class WeatherWorker(private val sleepTime: Long, private val checkSleepTime: Lon
 		this.running = false
 	}
 	
-	private suspend fun downloadImage(imageName: String, imageUrl: String) {
+	private fun downloadImage(imageName: String, imageUrl: String) {
 		
 		val targetFile = File(imageOptions.outputDir, imageName)
 		if (targetFile.exists()) throw AlreadyDownloadedException(imageUrl)
