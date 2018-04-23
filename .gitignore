@@ -142,6 +142,5 @@ gradle-app.setting
 .idea
 
 imgs
-imgs (copy)
-imgstage
-video
+miscdata
+miscdata/*

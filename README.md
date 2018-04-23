@@ -28,3 +28,6 @@ This program is copyrighted to Will Bresnahan or n9Mtq4 under the MIT License. M
 4. Either run "./gradlew build" on unix systems or "gradlew.bat build" on windows
 5. Your shiny new jar will be located in "build/libs/"
 
+
+## Recommended ffmpeg options for timelapse
+`ffmpeg -framerate 30 -pattern_type glob -i '*.jpg' -c:v libx264 -b:v 20MB -maxrate 20MB -bufsize 100MB video.mp4`
