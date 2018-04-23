@@ -1,5 +1,6 @@
 Possible values for resolutions
 
+FD (Full Disk)
 Resolutions     Bands
 339x339         all
 678x678         all
@@ -7,3 +8,18 @@ Resolutions     Bands
 5424x5424       all
 10848x10848     GeoColor, 1-3, 5
 21696x21696     2
+
+CONUS (contiguous United States)
+Resolutions     Bands
+416x250         all
+625x375         all
+1250x750        all
+2500x1500       all
+5000x3000       GeoColor, 1-3, 5
+10000x6000      2
+
+SECTOR/* (Regional sector view)
+Resolutions     Bands
+300x300         all
+600x600         all
+1200x1200       GeoColor, 1-3, 5

@@ -1,4 +1,4 @@
-package com.n9mtq4.goes16scraper
+package com.n9mtq4.goes16scraper.utils
 
 import java.text.SimpleDateFormat
 import java.util.*

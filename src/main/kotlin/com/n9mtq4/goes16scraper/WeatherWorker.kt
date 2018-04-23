@@ -1,13 +1,28 @@
 package com.n9mtq4.goes16scraper
 
+import com.n9mtq4.goes16scraper.utils.getTimestamp
+import kotlinx.coroutines.experimental.async
 import kotlinx.coroutines.experimental.runBlocking
+import org.json.simple.JSONArray
+import org.json.simple.JSONObject
+import org.json.simple.parser.JSONParser
+import org.jsoup.Jsoup
+import java.io.File
+import java.io.FileNotFoundException
+import java.io.FileOutputStream
+import java.net.URL
+import java.nio.channels.Channels
 
 /**
  * Created by will on 12/22/2017 at 7:19 PM.
- *
+ * 
  * @author Will "n9Mtq4" Bresnahan
  */
-class WeatherWorker(val sleepTime: Long, val checkSleepTime: Long) : Runnable {
+
+const val ROOT_URL = "https://cdn.star.nesdis.noaa.gov/GOES16/ABI/"
+const val USER_AGENT = "n9Mtq4-goes-east-scrapper/0.2 (+https://github.com/n9Mtq4/NOAA-Goes-16-image-scraper)"
+
+class WeatherWorker(private val sleepTime: Long, private val checkSleepTime: Long, private val imageOptions: ImageOptions) : Runnable {
 	
 	var ticks = 0
 	var running = true
@@ -42,10 +57,124 @@ class WeatherWorker(val sleepTime: Long, val checkSleepTime: Long) : Runnable {
 			
 		}
 		
+	}
+	
+	private fun work() {
+		
+		checkFilePermissions()
+		
+		try {
+			
+			// generate main directory url
+			val type = imageOptions.type
+			val band = imageOptions.band.run { 
+				if (toIntOrNull() == null) {
+					this
+				}else {
+					if (length < 1) "0$this" else this
+				}
+			}.toUpperCase() // if its a band #, make sure it is two chars
+			
+			val urlStr = "$ROOT_URL$type/$band/"
+			val jsonUrl = urlStr + "catalog.json"
+			println(jsonUrl)
+			
+//			SSLWorkaround.enableSSLSocket()
+			
+			// read catalog.json to figure out what images there are
+			// TODO: remove jsoup dependency?
+			val jsonStr = Jsoup
+					.connect(jsonUrl)
+					.header("Accept-Encoding", "gzip, deflate, br")
+					.userAgent(USER_AGENT)
+					.ignoreContentType(true)
+					.timeout(3000)
+					.maxBodySize(0).ignoreHttpErrors(true).followRedirects(true)
+					.execute()
+					.body()
+			
+			val parser = JSONParser()
+			val json: JSONObject = parser.parse(jsonStr) as JSONObject
+			val images = json["images"] as JSONObject
+			val imageList = (images[imageOptions.res] as JSONArray).toList().map { it as String }
+			
+			println(imageList)
+			
+			val imageUrlList = imageList.map { it to urlStr + it }
+			
+			val totalSize = imageUrlList.size
+			var failed = 0
+			var alreadyDownloaded = 0
+			var success = 0
+			
+			imageUrlList.divideIntoGroupsOf(5).forEach { smallImageList ->
+				runBlocking {
+					
+					smallImageList.map { (name, url) ->
+						async {
+							try {
+								downloadImage(name, url)
+								success++
+							}catch (ade: AlreadyDownloadedException) {
+								alreadyDownloaded++
+							}catch (fnfe: FileNotFoundException) {
+								println("Can't find: $name at $url")
+								failed++
+							}catch (e: Exception) {
+								e.printStackTrace()
+								failed++
+							}
+						}
+					}.forEach { it.await() }
+					
+				}
+			}
+			
+			println("Downloaded $success/$totalSize, already had $alreadyDownloaded, failed $failed")
+			println("Image download done!")
+			
+		} catch (e: Exception) {
+			println("Error downloading the images! Will try again at ${getTimestamp(sleepTime)}. (${e.localizedMessage})")
+			e.printStackTrace()
+		}
 		
 	}
 	
-	fun work() {
+	private fun <R> List<R>.divideIntoGroupsOf(size: Int): List<List<R>> {
+		
+		var l = this
+		val o = ArrayList<List<R>>()
+		while (l.isNotEmpty()) {
+			val s = if (l.size < size) l.size else size
+			o.add(l.take(s))
+			l = l.drop(s)
+		}
+		return o.toList()
+		
+	}
+	
+	
+	/**
+	 * checks to make sure that the file system is allowing us to read and write the required directories
+	 * the working directory must be rw for detecting and possibly creating a new directory
+	 * the ./img/ directory must be rw for checking if images exist and downloading images
+	 * */
+	private fun checkFilePermissions() {
+		
+		// make sure we can create the output directory to put the images
+		imageOptions.outputDir.absoluteFile.parentFile.run {
+			if (!canRead()) println("This program can't read the current directory. Check your permissions.")
+			if (!canWrite()) println("This program can't create the required directory! Check your permissions.")
+		}
+		
+		// make the output directory if needed
+		if (!imageOptions.outputDir.exists()) imageOptions.outputDir.mkdirs()
+		
+		// make sure we can read and write in the output directory
+		imageOptions.outputDir.run {
+			if (!canRead()) println("This program can't read the current directory. Check your permissions.")
+			if (!canWrite()) println("This program can't create the required directory! Check your permissions.")
+		}
 		
 	}
 	
@@ -59,12 +188,18 @@ class WeatherWorker(val sleepTime: Long, val checkSleepTime: Long) : Runnable {
 		this.running = false
 	}
 	
-	private fun runCycle() = runBlocking { 
+	private suspend fun downloadImage(imageName: String, imageUrl: String) {
 		
+		val targetFile = File(imageOptions.outputDir, imageName)
+		if (targetFile.exists()) throw AlreadyDownloadedException(imageUrl)
 		
-	}
-	
-	private suspend fun downloadImage() {
+		val url = URL(imageUrl)
+		val urlConnection = url.openConnection()
+		urlConnection.setRequestProperty("User-Agent", USER_AGENT)
+		val rbc = Channels.newChannel(urlConnection.getInputStream())
+		val fos = FileOutputStream(targetFile)
+		fos.channel.transferFrom(rbc, 0, Long.MAX_VALUE)
+		fos.close()
 		
 	}
 	

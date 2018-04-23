@@ -8,6 +8,7 @@ package com.n9mtq4.goes16scraper
 
 const val DEFAULT_OUTPUT_DIRECTORY = "imgs/"
 
+const val DEFAULT_TYPE = "FD"
 const val DEFAULT_BAND = "GeoColor"
 const val DEFAULT_RESOLUTION = "339x339"
 
