@@ -24,9 +24,11 @@ fun main(args: Array<String>) {
 		addOption("b", "band", true, "selects the color/band  (run --bands for list of types)")
 		addOption(null, "sleeptime", true, "the time between downloading images")
 		addOption(null, "checksleeptime", true, "the time between checking if sleep time has passed")
+		addOption(null, "infotechnique", true, "the strategy for gaining information on images")
 		addOption(null, "types", false, "prints a list of types")
 		addOption(null, "resolutions", false, "prints a list of resolutions")
 		addOption(null, "bands", false, "prints a list of bands")
+		addOption(null, "infotechniques", false, "prints a list of strategies for gaining information on images")
 		addOption(null, "help", false, "prints this help message")
 		
 	}
@@ -42,7 +44,7 @@ fun main(args: Array<String>) {
 		return
 	}
 	// lists of things
-	val helpList = listOf("types", "resolutions", "bands")
+	val helpList = listOf("types", "resolutions", "bands", "infotechniques")
 	helpList
 			.filter { cliargs.hasOption(it) }
 			.map { readFromJar("/text/$it.txt") }
@@ -54,10 +56,11 @@ fun main(args: Array<String>) {
 	val type = cliargs.getOptionValue("types") ?: DEFAULT_TYPE
 	val res = cliargs.getOptionValue("resolution") ?: DEFAULT_RESOLUTION
 	val band = cliargs.getOptionValue("band") ?: DEFAULT_BAND
+	val infoTechnique = cliargs.getOptionValue("infotechnique") ?: DEFAULT_INFOTECHNIQUE
 	val sleepTime = cliargs.getOptionValue("sleeptime")?.toLong() ?: DEFAULT_SLEEP_TIME
 	val checkSleepTime = cliargs.getOptionValue("checksleeptime")?.toLong() ?: DEFAULT_CHECK_SLEEP_TIME
 	
-	val imageOptions = ImageOptions(File(outputDir), type, res, band)
+	val imageOptions = ImageOptions(File(outputDir), type, res, band, infoTechnique)
 	
 	// start a weather worker with the options
 	val weatherWorker = WeatherWorker(sleepTime, checkSleepTime, imageOptions)

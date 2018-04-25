@@ -1,12 +1,11 @@
 package com.n9mtq4.goes16scraper
 
 import com.n9mtq4.goes16scraper.utils.getTimestamp
+import com.n9mtq4.goes16scraper.webparser.USER_AGENT
+import com.n9mtq4.goes16scraper.webparser.parseCatalog
+import com.n9mtq4.goes16scraper.webparser.parseDirectoryList
 import kotlinx.coroutines.experimental.launch
 import kotlinx.coroutines.experimental.runBlocking
-import org.json.simple.JSONArray
-import org.json.simple.JSONObject
-import org.json.simple.parser.JSONParser
-import org.jsoup.Jsoup
 import java.io.File
 import java.io.FileOutputStream
 import java.net.URL
@@ -18,9 +17,6 @@ import java.util.concurrent.atomic.AtomicInteger
  * 
  * @author Will "n9Mtq4" Bresnahan
  */
-
-const val ROOT_URL = "https://cdn.star.nesdis.noaa.gov/GOES16/ABI/"
-const val USER_AGENT = "n9Mtq4-goes-east-scrapper/0.2 (+https://github.com/n9Mtq4/NOAA-Goes-16-image-scraper)"
 
 class WeatherWorker(private val sleepTime: Long, private val checkSleepTime: Long, private val imageOptions: ImageOptions) : Runnable {
 	
@@ -65,38 +61,17 @@ class WeatherWorker(private val sleepTime: Long, private val checkSleepTime: Lon
 		
 		try {
 			
-			// generate main directory url
-			val type = imageOptions.type
-			val band = imageOptions.band.run { 
-				if (toIntOrNull() == null) {
-					this
-				}else {
-					if (length < 1) "0$this" else this
+			// make sure that everything is good
+			imageOptions.sanitize()
+			
+			val imageUrlList = when(imageOptions.infoTechnique) {
+				"catalog" -> parseCatalog(imageOptions)
+				"directorylist" -> parseDirectoryList(imageOptions)
+				else -> {
+					println("Not a valid info technique")
+					return
 				}
-			}.toUpperCase() // if its a band #, make sure it is two chars
-			
-			val urlStr = "$ROOT_URL$type/$band/"
-			val jsonUrl = urlStr + "catalog.json"
-			println(jsonUrl)
-			
-			val jsonStr = Jsoup
-					.connect(jsonUrl)
-					.header("Accept-Encoding", "gzip, deflate, br")
-					.userAgent(USER_AGENT)
-					.ignoreContentType(true)
-					.timeout(3000)
-					.maxBodySize(0).ignoreHttpErrors(true).followRedirects(true)
-					.execute()
-					.body()
-			
-			val parser = JSONParser()
-			val json: JSONObject = parser.parse(jsonStr) as JSONObject
-			val images = json["images"] as JSONObject
-			val imageList = (images[imageOptions.res] as JSONArray).toList().map { it as String }
-			
-			println(imageList)
-			
-			val imageUrlList = imageList.map { it to urlStr + it }
+			}
 			
 			downloadAll(imageUrlList)
 			

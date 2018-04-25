@@ -7,4 +7,10 @@ import java.io.File
  *
  * @author Will "n9Mtq4" Bresnahan
  */
-data class ImageOptions(val outputDir: File, val type: String, val res: String, val band: String)
+data class ImageOptions(var outputDir: File, var type: String, var res: String, var band: String, var infoTechnique: String) {
+	
+	fun sanitize() {
+		band = (band.toIntOrNull()?.toString()?.padStart(2, '0') ?: band).toUpperCase()
+	}
+	
+}
