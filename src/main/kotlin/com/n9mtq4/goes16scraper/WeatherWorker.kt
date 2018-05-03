@@ -166,6 +166,8 @@ class WeatherWorker(private val sleepTime: Long, private val checkSleepTime: Lon
 		val targetFile = File(imageOptions.outputDir, imageName)
 		if (targetFile.exists()) throw AlreadyDownloadedException(imageUrl)
 		
+		println("Downloading $imageName")
+		
 		val url = URL(imageUrl)
 		val urlConnection = url.openConnection()
 		urlConnection.setRequestProperty("User-Agent", USER_AGENT)
