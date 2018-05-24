@@ -100,6 +100,7 @@ class WeatherWorker(private val sleepTime: Long, private val checkSleepTime: Lon
 					try {
 						downloadImage(name, url)
 					}catch (e: Exception) {
+						e.printStackTrace()
 						failed.incrementAndGet()
 					}
 				} }.forEach { it.join() }
