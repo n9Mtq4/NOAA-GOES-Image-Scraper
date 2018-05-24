@@ -1,5 +1,5 @@
 buildscript {
-    ext.kotlin_version = '1.2.40'
+    ext.kotlin_version = '1.2.41'
     
     repositories {
         mavenCentral()
@@ -29,7 +29,7 @@ repositories {
 
 dependencies {
     compile "org.jetbrains.kotlin:kotlin-stdlib-jdk8:$kotlin_version"
-    compile "org.jetbrains.kotlinx:kotlinx-coroutines-jdk8:0.20"
+    compile "org.jetbrains.kotlinx:kotlinx-coroutines-jdk8:0.22.5"
     compile "commons-cli:commons-cli:1.2"
     compile "org.jsoup:jsoup:1.11.2"
     compile "com.googlecode.json-simple:json-simple:1.1.1"
