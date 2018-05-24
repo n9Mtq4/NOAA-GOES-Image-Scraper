@@ -87,20 +87,18 @@ class WeatherWorker(private val sleepTime: Long, private val checkSleepTime: Lon
 		
 		val totalSize = imageUrls.size
 		val failed = AtomicInteger(0)
-		val alreadyDownloaded = AtomicInteger(0)
-		val succeeded = AtomicInteger(0)
 		
-		// download in asynchronously in groups of 5
-		imageUrls.divideIntoGroupsOf(5).forEach { imgBatchGroup ->
+		val imagesToDownload = imageUrls.filter { (name, _) -> shouldDownloadImage(name) }
+		
+		// download in asynchronously in groups of 4
+		// there are 4 every hour, so this is a nice number
+		imagesToDownload.divideIntoGroupsOf(4).forEach { imgBatchGroup ->
 			
-			runBlocking { 
+			runBlocking {
 				
 				imgBatchGroup.map { (name, url) -> launch {
 					try {
 						downloadImage(name, url)
-						succeeded.incrementAndGet()
-					}catch (e: AlreadyDownloadedException) {
-						alreadyDownloaded.incrementAndGet()
 					}catch (e: Exception) {
 						failed.incrementAndGet()
 					}
@@ -109,6 +107,10 @@ class WeatherWorker(private val sleepTime: Long, private val checkSleepTime: Lon
 			}
 			
 		}
+		
+		// calculate some stats
+		val alreadyDownloaded = totalSize - imagesToDownload.size
+		val succeeded = imagesToDownload.size - failed.toInt()
 		
 		println("New: $succeeded, AlreadyHad: $alreadyDownloaded, Failed: $failed, Total: $totalSize")
 		
@@ -161,10 +163,28 @@ class WeatherWorker(private val sleepTime: Long, private val checkSleepTime: Lon
 		this.running = false
 	}
 	
+	/**
+	 * Checks to see if the image with the specified name should
+	 * be downloaded.
+	 * 
+	 * If the image exists (has already been downloaded) it should
+	 * not be downloaded again
+	 * 
+	 * @param imageName the name of the image to check
+	 * @return true if the image should be downloaded
+	 * */
+	private fun shouldDownloadImage(imageName: String): Boolean {
+		
+		val targetFile = getTargetImageFile(imageName)
+		
+		// TODO: could check for abnormal file sizes here to detect errors
+		return !targetFile.exists()
+		
+	}
+	
 	private fun downloadImage(imageName: String, imageUrl: String) {
 		
-		val targetFile = File(imageOptions.outputDir, imageName)
-		if (targetFile.exists()) throw AlreadyDownloadedException(imageUrl)
+		val targetFile = getTargetImageFile(imageName)
 		
 		println("Downloading $imageName")
 		
@@ -177,5 +197,7 @@ class WeatherWorker(private val sleepTime: Long, private val checkSleepTime: Lon
 		fos.close()
 		
 	}
+	
+	private fun getTargetImageFile(imageName: String): File = File(imageOptions.outputDir, imageName)
 	
 }
