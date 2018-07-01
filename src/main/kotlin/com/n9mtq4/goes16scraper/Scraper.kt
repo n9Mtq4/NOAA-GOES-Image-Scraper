@@ -24,6 +24,7 @@ fun main(args: Array<String>) {
 		addOption("b", "band", true, "selects the color/band  (run --bands for list of types)")
 		addOption(null, "sleeptime", true, "the time between downloading images")
 		addOption(null, "checksleeptime", true, "the time between checking if sleep time has passed")
+		addOption(null, "beforedownloadtime", true, "the time between downloading the list of images and actually downloading them")
 		addOption(null, "infotechnique", true, "the strategy for gaining information on images")
 		addOption(null, "types", false, "prints a list of types")
 		addOption(null, "resolutions", false, "prints a list of resolutions")
@@ -59,11 +60,12 @@ fun main(args: Array<String>) {
 	val infoTechnique = cliargs.getOptionValue("infotechnique") ?: DEFAULT_INFOTECHNIQUE
 	val sleepTime = cliargs.getOptionValue("sleeptime")?.toLong() ?: DEFAULT_SLEEP_TIME
 	val checkSleepTime = cliargs.getOptionValue("checksleeptime")?.toLong() ?: DEFAULT_CHECK_SLEEP_TIME
+	val beforeDownloadTime = cliargs.getOptionValue("beforedownloadtime")?.toLong() ?: DEFAULT_SLEEP_TIME_BEFORE_DOWNLOAD
 	
 	val imageOptions = ImageOptions(File(outputDir), type, res, band, infoTechnique)
 	
 	// start a weather worker with the options
-	val weatherWorker = WeatherWorker(sleepTime, checkSleepTime, imageOptions)
+	val weatherWorker = WeatherWorker(sleepTime, checkSleepTime, beforeDownloadTime, imageOptions)
 	weatherWorker.run()
 	
 }

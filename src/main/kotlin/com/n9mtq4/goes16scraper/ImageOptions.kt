@@ -10,6 +10,7 @@ import java.io.File
 data class ImageOptions(var outputDir: File, var type: String, var res: String, var band: String, var infoTechnique: String) {
 	
 	fun sanitize() {
+		// make sure that the number is two chars or its uppercase
 		band = (band.toIntOrNull()?.toString()?.padStart(2, '0') ?: band).toUpperCase()
 	}
 	

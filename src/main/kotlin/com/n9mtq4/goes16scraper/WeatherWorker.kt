@@ -1,6 +1,7 @@
 package com.n9mtq4.goes16scraper
 
 import com.n9mtq4.goes16scraper.utils.getTimestamp
+import com.n9mtq4.goes16scraper.utils.getTimestampAbsolute
 import com.n9mtq4.goes16scraper.webparser.USER_AGENT
 import com.n9mtq4.goes16scraper.webparser.parseCatalog
 import com.n9mtq4.goes16scraper.webparser.parseDirectoryList
@@ -18,13 +19,16 @@ import java.util.concurrent.atomic.AtomicInteger
  * @author Will "n9Mtq4" Bresnahan
  */
 
-class WeatherWorker(private val sleepTime: Long, private val checkSleepTime: Long, private val imageOptions: ImageOptions) : Runnable {
+class WeatherWorker(private val sleepTime: Long, private val checkSleepTime: Long, private val beforeDownloadTime: Long, private val imageOptions: ImageOptions) : Runnable {
 	
 	var ticks = 0
 	var running = true
 	var targetTime = System.currentTimeMillis()
 	
 	override fun run() {
+		
+		// make sure that the image options is good
+		imageOptions.sanitize()
 		
 		while (running) {
 			
@@ -42,14 +46,14 @@ class WeatherWorker(private val sleepTime: Long, private val checkSleepTime: Lon
 //			update ticks
 			ticks++
 			
+//			update target time for the next download
+			targetTime = System.currentTimeMillis() + sleepTime
+			
 //			download all the images
 			println("Started download: #$ticks at ${getTimestamp()}")
 			work()
 			println("Finished download #$ticks at ${getTimestamp()}")
-			println("The next download is targeted for ${getTimestamp(sleepTime)}")
-			
-//			update target time
-			targetTime = System.currentTimeMillis() + sleepTime
+			println("The next download is targeted for ${getTimestampAbsolute(targetTime)}")
 			
 		}
 		
@@ -57,12 +61,10 @@ class WeatherWorker(private val sleepTime: Long, private val checkSleepTime: Lon
 	
 	private fun work() {
 		
+		// check file permissions
 		checkFilePermissions()
 		
 		try {
-			
-			// make sure that everything is good
-			imageOptions.sanitize()
 			
 			val imageUrlList = when(imageOptions.infoTechnique) {
 				"catalog" -> parseCatalog(imageOptions)
@@ -73,8 +75,13 @@ class WeatherWorker(private val sleepTime: Long, private val checkSleepTime: Lon
 				}
 			}
 			
-			downloadAll(imageUrlList)
+			// sleep a bit between getting the list and downloading the images
+			// this is to stop the theoretical condition that we download a file that
+			// hasn't finished being copied to the remote hard drive.
+			println("Got list. Waiting ${beforeDownloadTime.toFloat() / 1000.0} seconds to download.")
+			Thread.sleep(beforeDownloadTime)
 			
+			downloadAll(imageUrlList)
 			
 		} catch (e: Exception) {
 			println("Error downloading the images! Will try again at ${getTimestamp(sleepTime)}. (${e.localizedMessage})")

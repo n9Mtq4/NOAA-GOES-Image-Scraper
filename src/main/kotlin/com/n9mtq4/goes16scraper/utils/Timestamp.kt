@@ -12,6 +12,14 @@ import java.util.*
 private val DATE_FORMAT = SimpleDateFormat("yyyy/MM/dd HH:mm:ss")
 
 /**
+ * gets the timestamp from ms milliseconds absolute
+ * @return the timestamp in the format of yyyy/MM/dd HH:mm:ss
+ * */
+internal fun getTimestampAbsolute(ms: Long): String {
+	return DATE_FORMAT.format(Date(ms))
+}
+
+/**
  * gets the timestamp in ms milliseconds in the future
  * @return the timestamp in the format of yyyy/MM/dd HH:mm:ss
  * */
