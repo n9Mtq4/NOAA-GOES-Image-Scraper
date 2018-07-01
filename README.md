@@ -20,21 +20,32 @@ NOAA's site with the images can be found [here](https://www.star.nesdis.noaa.gov
 
 ## Options
 ```
- -b,--band <arg>             selects the color/band  (run --bands for list
-                             of types)
-    --bands                  prints a list of bands
-    --checksleeptime <arg>   the time between checking if sleep time has
-                             passed
-    --help                   prints this help message
- -o,--output <arg>           selects the output directory for the images
- -r,--resolution <arg>       selects the image resolution to download (run
-                             --resolutions for list of resolutions)
-    --resolutions            prints a list of resolutions
-    --sleeptime <arg>        the time between downloading images
- -t,--type <arg>             the type of image (run --types for list of
-                             types)
-    --types                  prints a list of types
-
+ -b,--band <arg>                 selects the color/band  (run --bands for
+                                 list of types) (GeoColor)
+    --bands                      prints a list of bands
+    --beforedownloadtime <arg>   the time (ms) between downloading the
+                                 list of images and actually downloading
+                                 them (600000)
+    --checksleeptime <arg>       the time (ms) between checking if sleep
+                                 time has passed (600000)
+    --downloadBatchSize <arg>    the number of images to download at the
+                                 same time (4)
+    --help                       prints this help message
+    --infotechnique <arg>        the strategy for gaining information on
+                                 images (catalog)
+    --infotechniques             prints a list of strategies for gaining
+                                 information on images
+ -o,--output <arg>               selects the output directory for the
+                                 images (imgs/)
+ -r,--resolution <arg>           selects the image resolution to download
+                                 (run --resolutions for list of
+                                 resolutions) (339x339)
+    --resolutions                prints a list of resolutions
+    --sleeptime <arg>            the time (ms) between downloading images
+                                 (7200000)
+ -t,--type <arg>                 the type of image (run --types for list
+                                 of types) (FD)
+    --types                      prints a list of types
 ```
 
 #### Bands
