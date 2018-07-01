@@ -18,14 +18,15 @@ fun main(args: Array<String>) {
 	// the options
 	val options = Options().apply {
 		
-		addOption("o", "output", true, "selects the output directory for the images")
-		addOption("t", "type", true, "the type of image (run --types for list of types)")
-		addOption("r", "resolution", true, "selects the image resolution to download (run --resolutions for list of resolutions)")
-		addOption("b", "band", true, "selects the color/band  (run --bands for list of types)")
-		addOption(null, "sleeptime", true, "the time between downloading images")
-		addOption(null, "checksleeptime", true, "the time between checking if sleep time has passed")
-		addOption(null, "beforedownloadtime", true, "the time between downloading the list of images and actually downloading them")
-		addOption(null, "infotechnique", true, "the strategy for gaining information on images")
+		addOption("o", "output", true, "selects the output directory for the images ($DEFAULT_OUTPUT_DIRECTORY)")
+		addOption("t", "type", true, "the type of image (run --types for list of types) ($DEFAULT_TYPE)")
+		addOption("r", "resolution", true, "selects the image resolution to download (run --resolutions for list of resolutions) ($DEFAULT_RESOLUTION)")
+		addOption("b", "band", true, "selects the color/band  (run --bands for list of types) ($DEFAULT_BAND)")
+		addOption(null, "sleeptime", true, "the time (ms) between downloading images ($DEFAULT_SLEEP_TIME)")
+		addOption(null, "checksleeptime", true, "the time (ms) between checking if sleep time has passed ($DEFAULT_CHECK_SLEEP_TIME)")
+		addOption(null, "beforedownloadtime", true, "the time (ms) between downloading the list of images and actually downloading them ($DEFAULT_SLEEP_TIME_BEFORE_DOWNLOAD)")
+		addOption(null, "downloadBatchSize", true, "the number of images to download at the same time ($DEFAULT_DOWNLOAD_BATCH_SIZE)")
+		addOption(null, "infotechnique", true, "the strategy for gaining information on images ($DEFAULT_INFOTECHNIQUE)")
 		addOption(null, "types", false, "prints a list of types")
 		addOption(null, "resolutions", false, "prints a list of resolutions")
 		addOption(null, "bands", false, "prints a list of bands")
@@ -61,11 +62,12 @@ fun main(args: Array<String>) {
 	val sleepTime = cliargs.getOptionValue("sleeptime")?.toLong() ?: DEFAULT_SLEEP_TIME
 	val checkSleepTime = cliargs.getOptionValue("checksleeptime")?.toLong() ?: DEFAULT_CHECK_SLEEP_TIME
 	val beforeDownloadTime = cliargs.getOptionValue("beforedownloadtime")?.toLong() ?: DEFAULT_SLEEP_TIME_BEFORE_DOWNLOAD
+	val downloadBatchSize = cliargs.getOptionValue("downloadBatchSize")?.toInt() ?: DEFAULT_DOWNLOAD_BATCH_SIZE
 	
 	val imageOptions = ImageOptions(File(outputDir), type, res, band, infoTechnique)
 	
 	// start a weather worker with the options
-	val weatherWorker = WeatherWorker(sleepTime, checkSleepTime, beforeDownloadTime, imageOptions)
+	val weatherWorker = WeatherWorker(sleepTime, checkSleepTime, beforeDownloadTime, downloadBatchSize, imageOptions)
 	weatherWorker.run()
 	
 }

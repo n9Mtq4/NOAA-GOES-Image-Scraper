@@ -1,16 +1,18 @@
 package com.n9mtq4.goes16scraper
 
-import com.n9mtq4.goes16scraper.utils.getTimestamp
+import com.n9mtq4.goes16scraper.utils.getFutureTimestamp
 import com.n9mtq4.goes16scraper.utils.getTimestampAbsolute
 import com.n9mtq4.goes16scraper.webparser.USER_AGENT
 import com.n9mtq4.goes16scraper.webparser.parseCatalog
 import com.n9mtq4.goes16scraper.webparser.parseDirectoryList
+import kotlinx.coroutines.experimental.asCoroutineDispatcher
 import kotlinx.coroutines.experimental.launch
 import kotlinx.coroutines.experimental.runBlocking
 import java.io.File
 import java.io.FileOutputStream
 import java.net.URL
 import java.nio.channels.Channels
+import java.util.concurrent.Executors
 import java.util.concurrent.atomic.AtomicInteger
 
 /**
@@ -19,15 +21,19 @@ import java.util.concurrent.atomic.AtomicInteger
  * @author Will "n9Mtq4" Bresnahan
  */
 
-class WeatherWorker(private val sleepTime: Long, private val checkSleepTime: Long, private val beforeDownloadTime: Long, private val imageOptions: ImageOptions) : Runnable {
+class WeatherWorker(private val sleepTime: Long, private val checkSleepTime: Long, private val beforeDownloadTime: Long, private val downloadBatchSize: Int, private val imageOptions: ImageOptions) : Runnable {
 	
 	var ticks = 0
 	var running = true
 	var targetTime = System.currentTimeMillis()
 	
+	val executorService = Executors.newFixedThreadPool(downloadBatchSize)
+	val coroutineDispatcher = executorService.asCoroutineDispatcher()
+	
 	override fun run() {
 		
 		// make sure that the image options is good
+		// only needs to go once
 		imageOptions.sanitize()
 		
 		while (running) {
@@ -50,9 +56,9 @@ class WeatherWorker(private val sleepTime: Long, private val checkSleepTime: Lon
 			targetTime = System.currentTimeMillis() + sleepTime
 			
 //			download all the images
-			println("Started download: #$ticks at ${getTimestamp()}")
+			println("Started download: #$ticks at ${getFutureTimestamp()}")
 			work()
-			println("Finished download #$ticks at ${getTimestamp()}")
+			println("Finished download #$ticks at ${getFutureTimestamp()}")
 			println("The next download is targeted for ${getTimestampAbsolute(targetTime)}")
 			
 		}
@@ -62,6 +68,7 @@ class WeatherWorker(private val sleepTime: Long, private val checkSleepTime: Lon
 	private fun work() {
 		
 		// check file permissions
+		// should make sure before every run
 		checkFilePermissions()
 		
 		try {
@@ -70,7 +77,7 @@ class WeatherWorker(private val sleepTime: Long, private val checkSleepTime: Lon
 				"catalog" -> parseCatalog(imageOptions)
 				"directorylist" -> parseDirectoryList(imageOptions)
 				else -> {
-					println("Not a valid info technique")
+					println("Not a valid info technique - ${imageOptions.infoTechnique}")
 					return
 				}
 			}
@@ -84,7 +91,7 @@ class WeatherWorker(private val sleepTime: Long, private val checkSleepTime: Lon
 			downloadAll(imageUrlList)
 			
 		} catch (e: Exception) {
-			println("Error downloading the images! Will try again at ${getTimestamp(sleepTime)}. (${e.localizedMessage})")
+			println("Error downloading the images! Will try again at ${getTimestampAbsolute(targetTime)}. (${e.localizedMessage})")
 			e.printStackTrace()
 		}
 		
@@ -97,22 +104,18 @@ class WeatherWorker(private val sleepTime: Long, private val checkSleepTime: Lon
 		
 		val imagesToDownload = imageUrls.filter { (name, _) -> shouldDownloadImage(name) }
 		
-		// download in asynchronously in groups of 4
-		// there are 4 every hour, so this is a nice number
-		imagesToDownload.divideIntoGroupsOf(4).forEach { imgBatchGroup ->
+		runBlocking (context = coroutineDispatcher) {
 			
-			runBlocking {
+			imagesToDownload.map { (name, url) -> launch (context = coroutineDispatcher) {
 				
-				imgBatchGroup.map { (name, url) -> launch {
-					try {
-						downloadImage(name, url)
-					}catch (e: Exception) {
-						e.printStackTrace()
-						failed.incrementAndGet()
-					}
-				} }.forEach { it.join() }
+				try {
+					downloadImage(name, url)
+				}catch (e: Exception) {
+					e.printStackTrace()
+					failed.incrementAndGet()
+				}
 				
-			}
+			} }.forEach { it.join() }
 			
 		}
 		
@@ -121,19 +124,6 @@ class WeatherWorker(private val sleepTime: Long, private val checkSleepTime: Lon
 		val succeeded = imagesToDownload.size - failed.toInt()
 		
 		println("New: $succeeded, AlreadyHad: $alreadyDownloaded, Failed: $failed, Total: $totalSize")
-		
-	}
-	
-	private fun <R> List<R>.divideIntoGroupsOf(size: Int): List<List<R>> {
-		
-		var l = this
-		val o = ArrayList<List<R>>()
-		while (l.isNotEmpty()) {
-			val s = if (l.size < size) l.size else size
-			o.add(l.take(s))
-			l = l.drop(s)
-		}
-		return o.toList()
 		
 	}
 	

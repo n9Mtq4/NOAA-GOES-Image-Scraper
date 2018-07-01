@@ -23,14 +23,16 @@ internal fun getTimestampAbsolute(ms: Long): String {
  * gets the timestamp in ms milliseconds in the future
  * @return the timestamp in the format of yyyy/MM/dd HH:mm:ss
  * */
-internal fun getTimestamp(ms: Long): String {
-	return DATE_FORMAT.format(Date(System.currentTimeMillis() + ms))
+internal fun getFutureTimestamp(ms: Long): String {
+	return getTimestampAbsolute(System.currentTimeMillis() + ms)
 }
 
 /**
- * @return the current timestamp
- * @see getTimestamp
+ * gets the current timestamp
+ * @return the current timestamp in the format of yyyy/MM/dd HH:mm:ss
+ * @see getFutureTimestamp
+ * @see getTimestampAbsolute
  * */
-internal fun getTimestamp(): String {
-	return getTimestamp(0)
+internal fun getFutureTimestamp(): String {
+	return getFutureTimestamp(0)
 }
