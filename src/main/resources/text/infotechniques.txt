@@ -1,5 +1,5 @@
 Information techniques
 
 Name            Description
-catalog         (default) from a file called catalog.json
-directorylist   from the webserver's directory list
+catalog         (broken) from a file called catalog.json
+directorylist   (default) from the webserver's directory list

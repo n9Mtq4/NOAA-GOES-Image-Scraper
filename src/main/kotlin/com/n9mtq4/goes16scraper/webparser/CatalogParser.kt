@@ -14,6 +14,13 @@ import org.jsoup.Jsoup
 
 /**
  * Gets a list of images from the image catalog
+ * 
+ * It seems like catalog.json is no longer generated and
+ * instead they are embedding the list into javascript that is
+ * served inside the php page for animations (animationImages).
+ * 
+ * That means that this no longer works, but will remain for
+ * historical reasons.
  * */
 internal fun parseCatalog(imageOptions: ImageOptions): List<Pair<String, String>> {
 	
