@@ -30,9 +30,9 @@ internal fun getFutureTimestamp(ms: Long): String {
 /**
  * gets the current timestamp
  * @return the current timestamp in the format of yyyy/MM/dd HH:mm:ss
- * @see getFutureTimestamp
+ * @see getTimestamp
  * @see getTimestampAbsolute
  * */
-internal fun getFutureTimestamp(): String {
+internal fun getTimestamp(): String {
 	return getFutureTimestamp(0)
 }

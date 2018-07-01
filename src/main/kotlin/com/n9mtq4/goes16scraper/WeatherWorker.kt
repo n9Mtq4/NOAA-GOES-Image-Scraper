@@ -1,6 +1,6 @@
 package com.n9mtq4.goes16scraper
 
-import com.n9mtq4.goes16scraper.utils.getFutureTimestamp
+import com.n9mtq4.goes16scraper.utils.getTimestamp
 import com.n9mtq4.goes16scraper.utils.getTimestampAbsolute
 import com.n9mtq4.goes16scraper.webparser.USER_AGENT
 import com.n9mtq4.goes16scraper.webparser.parseCatalog
@@ -56,9 +56,9 @@ class WeatherWorker(private val sleepTime: Long, private val checkSleepTime: Lon
 			targetTime = System.currentTimeMillis() + sleepTime
 			
 //			download all the images
-			println("Started download: #$ticks at ${getFutureTimestamp()}")
+			println("Started download: #$ticks at ${getTimestamp()}")
 			work()
-			println("Finished download #$ticks at ${getFutureTimestamp()}")
+			println("Finished download #$ticks at ${getTimestamp()}")
 			println("The next download is targeted for ${getTimestampAbsolute(targetTime)}")
 			
 		}
