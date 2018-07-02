@@ -2,7 +2,7 @@ package com.n9mtq4.goes16scraper
 
 import com.n9mtq4.goes16scraper.utils.readFromJar
 import org.apache.commons.cli.CommandLineParser
-import org.apache.commons.cli.GnuParser
+import org.apache.commons.cli.DefaultParser
 import org.apache.commons.cli.HelpFormatter
 import org.apache.commons.cli.Options
 import java.io.File
@@ -36,7 +36,8 @@ fun main(args: Array<String>) {
 	}
 	
 	// the parser
-	val parser: CommandLineParser = GnuParser()
+	// val parser: CommandLineParser = GnuParser()
+	val parser: CommandLineParser = DefaultParser()
 	val cliargs = parser.parse(options, args)
 	
 	// help information
