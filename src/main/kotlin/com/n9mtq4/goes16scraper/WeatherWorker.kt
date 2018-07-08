@@ -219,15 +219,15 @@ class WeatherWorker(private val sleepTime: Long, private val checkSleepTime: Lon
 				// delete the incorrect image
 				targetFile.delete()
 				
-				throw WrongSizeException(size, actualSize)
+				exception = WrongSizeException(imageName, size, actualSize)
 			}
 			
 		}
 		
-		// let java's url stuff recover?
-		Thread.sleep(1000)
-		
-		exception?.let { throw it }
+		exception?.let {
+			Thread.sleep(2000) // sleep 2 seconds to not spam a broken system
+			throw it
+		}
 		
 	}
 	
