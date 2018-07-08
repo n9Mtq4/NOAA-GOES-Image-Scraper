@@ -1,6 +1,8 @@
 package com.n9mtq4.goes16scraper.webparser
 
 import com.n9mtq4.goes16scraper.ImageOptions
+import com.n9mtq4.goes16scraper.ImageToDownload
+import com.n9mtq4.goes16scraper.ImageToDownloadList
 import org.json.simple.JSONArray
 import org.json.simple.JSONObject
 import org.json.simple.parser.JSONParser
@@ -22,7 +24,7 @@ import org.jsoup.Jsoup
  * That means that this no longer works, but will remain for
  * historical reasons.
  * */
-internal fun parseCatalog(imageOptions: ImageOptions): List<Pair<String, String>> {
+internal fun parseCatalog(imageOptions: ImageOptions): ImageToDownloadList {
 	
 	val urlStr = "$ROOT_URL${imageOptions.type}/${imageOptions.band}/"
 	val jsonUrl = urlStr + "catalog.json"
@@ -42,7 +44,7 @@ internal fun parseCatalog(imageOptions: ImageOptions): List<Pair<String, String>
 	val json: JSONObject = parser.parse(jsonStr) as JSONObject
 	val images = json["images"] as JSONObject
 	val imageList = (images[imageOptions.res] as JSONArray).toList().map { it as String }
-	val imageUrlList = imageList.map { it to urlStr + it }
+	val imageUrlList = imageList.map { ImageToDownload(it, urlStr + it) }
 	
 	return imageUrlList
 	

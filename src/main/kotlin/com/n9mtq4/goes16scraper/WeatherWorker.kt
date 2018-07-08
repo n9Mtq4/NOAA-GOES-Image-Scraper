@@ -1,10 +1,12 @@
 package com.n9mtq4.goes16scraper
 
+import com.n9mtq4.goes16scraper.exceptions.WrongSizeException
 import com.n9mtq4.goes16scraper.utils.getTimestamp
 import com.n9mtq4.goes16scraper.utils.getTimestampAbsolute
 import com.n9mtq4.goes16scraper.webparser.USER_AGENT
 import com.n9mtq4.goes16scraper.webparser.parseCatalog
 import com.n9mtq4.goes16scraper.webparser.parseDirectoryList
+import com.n9mtq4.goes16scraper.webparser.parseDirectoryListSize
 import kotlinx.coroutines.experimental.asCoroutineDispatcher
 import kotlinx.coroutines.experimental.launch
 import kotlinx.coroutines.experimental.runBlocking
@@ -76,6 +78,7 @@ class WeatherWorker(private val sleepTime: Long, private val checkSleepTime: Lon
 			val imageUrlList = when(imageOptions.infoTechnique) {
 				"catalog" -> parseCatalog(imageOptions)
 				"directorylist" -> parseDirectoryList(imageOptions)
+				"directorylistsize" -> parseDirectoryListSize(imageOptions)
 				else -> {
 					println("Not a valid info technique - ${imageOptions.infoTechnique}")
 					return
@@ -97,7 +100,7 @@ class WeatherWorker(private val sleepTime: Long, private val checkSleepTime: Lon
 		
 	}
 	
-	private fun downloadAll(imageUrls: List<Pair<String, String>>) { 
+	private fun downloadAll(imageUrls: ImageToDownloadList) { 
 		
 		val totalSize = imageUrls.size
 		val failed = AtomicInteger(0)
@@ -106,10 +109,10 @@ class WeatherWorker(private val sleepTime: Long, private val checkSleepTime: Lon
 		
 		runBlocking (context = coroutineDispatcher) {
 			
-			imagesToDownload.map { (name, url) -> launch (context = coroutineDispatcher) {
+			imagesToDownload.map { imageToDownload -> launch (context = coroutineDispatcher) {
 				
 				try {
-					downloadImage(name, url)
+					downloadImage(imageToDownload)
 				}catch (e: Exception) {
 					e.printStackTrace()
 					failed.incrementAndGet()
@@ -180,21 +183,51 @@ class WeatherWorker(private val sleepTime: Long, private val checkSleepTime: Lon
 		
 	}
 	
-	private fun downloadImage(imageName: String, imageUrl: String) {
+	private fun downloadImage(imageToDownload: ImageToDownload) {
 		
+		val (imageName, imageUrl, imageSize) = imageToDownload
 		val targetFile = getTargetImageFile(imageName)
-		
 		println("Downloading $imageName")
 		
-		val url = URL(imageUrl)
-		val urlConnection = url.openConnection()
-		urlConnection.connectTimeout = TIMEOUT_MS // timeouts of 20 seconds
-		urlConnection.readTimeout = TIMEOUT_MS
-		urlConnection.setRequestProperty("User-Agent", USER_AGENT)
-		val rbc = Channels.newChannel(urlConnection.getInputStream())
-		val fos = FileOutputStream(targetFile)
-		fos.channel.transferFrom(rbc, 0, Long.MAX_VALUE)
-		fos.close()
+		var exception: Exception? = null
+		
+		try {
+			val url = URL(imageUrl)
+			val urlConnection = url.openConnection()
+			urlConnection.connectTimeout = TIMEOUT_MS // timeouts of 20 seconds
+			urlConnection.readTimeout = TIMEOUT_MS
+			urlConnection.setRequestProperty("User-Agent", USER_AGENT)
+			urlConnection.getInputStream().use { urlInputStream ->
+				Channels.newChannel(urlInputStream).use { rbc ->
+					FileOutputStream(targetFile).use { fos ->
+						fos.channel.transferFrom(rbc, 0, Long.MAX_VALUE)
+					}
+				}
+			}
+		}catch (e: Exception) {
+			exception = e
+		}
+		
+		// check download size if supported
+		imageSize.takeIf { it > 0 }?.let { size ->
+			
+			val actualSize = targetFile.length()
+			
+			if (size != actualSize) {
+				
+				// size is wrong
+				// delete the incorrect image
+				targetFile.delete()
+				
+				throw WrongSizeException(size, actualSize)
+			}
+			
+		}
+		
+		// let java's url stuff recover?
+		Thread.sleep(1000)
+		
+		exception?.let { throw it }
 		
 	}
 	

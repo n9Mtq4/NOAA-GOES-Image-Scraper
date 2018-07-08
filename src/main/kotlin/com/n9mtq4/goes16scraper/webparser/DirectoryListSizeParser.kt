@@ -12,9 +12,10 @@ import org.jsoup.Jsoup
  * @author Will "n9Mtq4" Bresnahan
  */
 
-private const val LINK_SELECTOR = "body > pre > a"
+private const val FULL_LIST_SELECTOR = "body > pre"
+private const val SPACE_REGEX_STRING = "\\s+"
 
-internal fun parseDirectoryList(imageOptions: ImageOptions): ImageToDownloadList {
+internal fun parseDirectoryListSize(imageOptions: ImageOptions): ImageToDownloadList {
 	
 	val urlStr = "$ROOT_URL${imageOptions.type}/${imageOptions.band}/"
 	
@@ -28,13 +29,20 @@ internal fun parseDirectoryList(imageOptions: ImageOptions): ImageToDownloadList
 			.followRedirects(true)
 			.get()
 	
-	val imgUrlList = dListDom
-			.select(LINK_SELECTOR)
-			.map { it.text() }
-			.filter { imageOptions.res in it }
-			.filter { "GOES16" in it }
-			.map { ImageToDownload(it, urlStr + it) }
+	val spaceRegex = Regex(SPACE_REGEX_STRING)
 	
-	return imgUrlList
+	val imgUrlSizeList = dListDom
+			.select(FULL_LIST_SELECTOR)
+			.text()
+			.split("\n")
+			.map { it.trim() }
+			.map { it.split(spaceRegex) }
+			.filter { it.size == 4 }
+			.map { it[0] to it[3].toLong() }
+			.filter { (name, _) -> imageOptions.res in name }
+			.filter { (name, _) -> "GOES16" in name }
+			.map { (name, size) -> ImageToDownload(name, urlStr + name, size) }
+	
+	return imgUrlSizeList
 	
 }

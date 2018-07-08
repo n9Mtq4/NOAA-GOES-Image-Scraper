@@ -1,5 +1,6 @@
 Information techniques
 
-Name            Description
-catalog         (broken) from a file called catalog.json
-directorylist   (default) from the webserver's directory list
+Name                Description
+catalog             (broken) from a file called catalog.json
+directorylist       (default) from the webserver's directory list
+directorylistsize   from the websever's directory list, with size checking

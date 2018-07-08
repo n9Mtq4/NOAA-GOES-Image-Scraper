@@ -25,7 +25,7 @@ fun main(args: Array<String>) {
 		addOption(null, "sleeptime", true, "the time (ms) between downloading images ($DEFAULT_SLEEP_TIME)")
 		addOption(null, "checksleeptime", true, "the time (ms) between checking if sleep time has passed ($DEFAULT_CHECK_SLEEP_TIME)")
 		addOption(null, "beforedownloadtime", true, "the time (ms) between downloading the list of images and actually downloading them ($DEFAULT_SLEEP_TIME_BEFORE_DOWNLOAD)")
-		addOption(null, "downloadBatchSize", true, "the number of images to download at the same time ($DEFAULT_DOWNLOAD_BATCH_SIZE)")
+		addOption(null, "downloadbatchsize", true, "the number of images to download at the same time ($DEFAULT_DOWNLOAD_BATCH_SIZE)")
 		addOption(null, "infotechnique", true, "the strategy for gaining information on images ($DEFAULT_INFOTECHNIQUE)")
 		addOption(null, "types", false, "prints a list of types")
 		addOption(null, "resolutions", false, "prints a list of resolutions")
@@ -63,7 +63,7 @@ fun main(args: Array<String>) {
 	val sleepTime = cliargs.getOptionValue("sleeptime")?.toLong() ?: DEFAULT_SLEEP_TIME
 	val checkSleepTime = cliargs.getOptionValue("checksleeptime")?.toLong() ?: DEFAULT_CHECK_SLEEP_TIME
 	val beforeDownloadTime = cliargs.getOptionValue("beforedownloadtime")?.toLong() ?: DEFAULT_SLEEP_TIME_BEFORE_DOWNLOAD
-	val downloadBatchSize = cliargs.getOptionValue("downloadBatchSize")?.toInt() ?: DEFAULT_DOWNLOAD_BATCH_SIZE
+	val downloadBatchSize = cliargs.getOptionValue("downloadbatchsize")?.toInt() ?: DEFAULT_DOWNLOAD_BATCH_SIZE
 	
 	val imageOptions = ImageOptions(File(outputDir), type, res, band, infoTechnique)
 	
