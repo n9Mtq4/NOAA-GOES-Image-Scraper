@@ -1,6 +1,7 @@
 package com.n9mtq4.goes16scraper.webparser
 
 import com.n9mtq4.goes16scraper.ImageOptions
+import com.n9mtq4.goes16scraper.TIMEOUT_MS
 import org.jsoup.Jsoup
 
 /**
@@ -19,7 +20,7 @@ internal fun parseDirectoryList(imageOptions: ImageOptions): List<Pair<String, S
 			.connect(urlStr)
 			.header("Accept-Encoding", "gzip, deflate, br")
 			.userAgent(USER_AGENT)
-			.timeout(3000)
+			.timeout(TIMEOUT_MS)
 			.maxBodySize(0).ignoreHttpErrors(true).followRedirects(true)
 			.get()
 	

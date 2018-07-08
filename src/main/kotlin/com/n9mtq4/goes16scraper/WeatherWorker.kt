@@ -188,6 +188,8 @@ class WeatherWorker(private val sleepTime: Long, private val checkSleepTime: Lon
 		
 		val url = URL(imageUrl)
 		val urlConnection = url.openConnection()
+		urlConnection.connectTimeout = TIMEOUT_MS // timeouts of 20 seconds
+		urlConnection.readTimeout = TIMEOUT_MS
 		urlConnection.setRequestProperty("User-Agent", USER_AGENT)
 		val rbc = Channels.newChannel(urlConnection.getInputStream())
 		val fos = FileOutputStream(targetFile)

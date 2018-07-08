@@ -6,6 +6,8 @@ package com.n9mtq4.goes16scraper
  * @author Will "n9Mtq4" Bresnahan
  */
 
+const val TIMEOUT_MS = 20000
+
 const val DEFAULT_OUTPUT_DIRECTORY = "imgs/"
 
 const val DEFAULT_TYPE = "FD"
