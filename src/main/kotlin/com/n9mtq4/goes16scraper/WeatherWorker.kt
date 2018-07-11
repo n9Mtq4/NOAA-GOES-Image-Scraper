@@ -107,9 +107,9 @@ class WeatherWorker(private val sleepTime: Long, private val checkSleepTime: Lon
 		
 		val imagesToDownload = imageUrls.filter { (name, _) -> shouldDownloadImage(name) }
 		
-		runBlocking (context = coroutineDispatcher) {
+		runBlocking(context = coroutineDispatcher) {
 			
-			imagesToDownload.map { imageToDownload -> launch (context = coroutineDispatcher) {
+			imagesToDownload.map { imageToDownload -> launch(context = coroutineDispatcher) {
 				
 				try {
 					downloadImage(imageToDownload)
@@ -194,8 +194,8 @@ class WeatherWorker(private val sleepTime: Long, private val checkSleepTime: Lon
 		try {
 			val url = URL(imageUrl)
 			val urlConnection = url.openConnection()
-			urlConnection.connectTimeout = TIMEOUT_MS // timeouts of 20 seconds
-			urlConnection.readTimeout = TIMEOUT_MS
+			urlConnection.connectTimeout = CONNECTION_TIMEOUT_MS
+			urlConnection.readTimeout = READ_TIMEOUT_MS
 			urlConnection.setRequestProperty("User-Agent", USER_AGENT)
 			urlConnection.getInputStream().use { urlInputStream ->
 				Channels.newChannel(urlInputStream).use { rbc ->

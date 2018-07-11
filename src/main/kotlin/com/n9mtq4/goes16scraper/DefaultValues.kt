@@ -6,7 +6,8 @@ package com.n9mtq4.goes16scraper
  * @author Will "n9Mtq4" Bresnahan
  */
 
-const val TIMEOUT_MS = 1000 * 60 * 5 // 5 minute timeout
+const val CONNECTION_TIMEOUT_MS = 1000 * 60 * 5 // 5 minute timeout
+const val READ_TIMEOUT_MS = CONNECTION_TIMEOUT_MS * 10 // 10 times connection timeout
 
 const val DEFAULT_OUTPUT_DIRECTORY = "imgs/"
 
