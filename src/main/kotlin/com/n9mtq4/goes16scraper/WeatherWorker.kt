@@ -12,6 +12,7 @@ import kotlinx.coroutines.experimental.launch
 import kotlinx.coroutines.experimental.runBlocking
 import java.io.File
 import java.io.FileOutputStream
+import java.net.HttpURLConnection
 import java.net.URL
 import java.nio.channels.Channels
 import java.util.concurrent.Executors
@@ -114,7 +115,12 @@ class WeatherWorker(private val sleepTime: Long, private val checkSleepTime: Lon
 				try {
 					downloadImage(imageToDownload)
 				}catch (e: Exception) {
-					e.printStackTrace()
+					
+					when (e) {
+						is WrongSizeException -> println(e.message)
+						else -> e.printStackTrace()
+					}
+					
 					failed.incrementAndGet()
 				}
 				
@@ -193,14 +199,16 @@ class WeatherWorker(private val sleepTime: Long, private val checkSleepTime: Lon
 		
 		try {
 			val url = URL(imageUrl)
-			val urlConnection = url.openConnection()
+			val urlConnection = url.openConnection() as HttpURLConnection
+			urlConnection.requestMethod = "GET"
 			urlConnection.connectTimeout = CONNECTION_TIMEOUT_MS
 			urlConnection.readTimeout = READ_TIMEOUT_MS
 			urlConnection.setRequestProperty("User-Agent", USER_AGENT)
-			urlConnection.getInputStream().use { urlInputStream ->
+			urlConnection.inputStream.use { urlInputStream ->
 				Channels.newChannel(urlInputStream).use { rbc ->
 					FileOutputStream(targetFile).use { fos ->
 						fos.channel.transferFrom(rbc, 0, Long.MAX_VALUE)
+						// println("$imageName: HTTP ${urlConnection.responseCode}")
 					}
 				}
 			}
