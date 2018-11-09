@@ -7,7 +7,13 @@ import java.io.File
  *
  * @author Will "n9Mtq4" Bresnahan
  */
-data class ImageOptions(var outputDir: File, var type: String, var res: String, var band: String, var infoTechnique: String) {
+data class ImageOptions(
+	var outputDir: File,
+	var type: String,
+	var res: String,
+	var band: String,
+	var infoTechnique: String
+) {
 	
 	fun sanitize() {
 		// make sure that the number is two chars or its uppercase

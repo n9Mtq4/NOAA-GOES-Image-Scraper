@@ -55,20 +55,24 @@ fun main(args: Array<String>) {
 			.forEach { return }
 	
 	// get command line args or default values
-	val outputDir = cliargs.getOptionValue("output") ?: DEFAULT_OUTPUT_DIRECTORY
-	val type = cliargs.getOptionValue("types") ?: DEFAULT_TYPE
-	val res = cliargs.getOptionValue("resolution") ?: DEFAULT_RESOLUTION
-	val band = cliargs.getOptionValue("band") ?: DEFAULT_BAND
-	val infoTechnique = cliargs.getOptionValue("infotechnique") ?: DEFAULT_INFOTECHNIQUE
-	val sleepTime = cliargs.getOptionValue("sleeptime")?.toLong() ?: DEFAULT_SLEEP_TIME
-	val checkSleepTime = cliargs.getOptionValue("checksleeptime")?.toLong() ?: DEFAULT_CHECK_SLEEP_TIME
-	val beforeDownloadTime = cliargs.getOptionValue("beforedownloadtime")?.toLong() ?: DEFAULT_SLEEP_TIME_BEFORE_DOWNLOAD
-	val downloadBatchSize = cliargs.getOptionValue("downloadbatchsize")?.toInt() ?: DEFAULT_DOWNLOAD_BATCH_SIZE
-	
-	val imageOptions = ImageOptions(File(outputDir), type, res, band, infoTechnique)
-	
-	// start a weather worker with the options
-	val weatherWorker = WeatherWorker(sleepTime, checkSleepTime, beforeDownloadTime, downloadBatchSize, imageOptions)
-	weatherWorker.run()
+	cliargs.run {
+		
+		val outputDir = getOptionValue("output") ?: DEFAULT_OUTPUT_DIRECTORY
+		val type = getOptionValue("types") ?: DEFAULT_TYPE
+		val res = getOptionValue("resolution") ?: DEFAULT_RESOLUTION
+		val band = getOptionValue("band") ?: DEFAULT_BAND
+		val infoTechnique = getOptionValue("infotechnique") ?: DEFAULT_INFOTECHNIQUE
+		val sleepTime = getOptionValue("sleeptime")?.toLong() ?: DEFAULT_SLEEP_TIME
+		val checkSleepTime = getOptionValue("checksleeptime")?.toLong() ?: DEFAULT_CHECK_SLEEP_TIME
+		val beforeDownloadTime = getOptionValue("beforedownloadtime")?.toLong() ?: DEFAULT_SLEEP_TIME_BEFORE_DOWNLOAD
+		val downloadBatchSize = getOptionValue("downloadbatchsize")?.toInt() ?: DEFAULT_DOWNLOAD_BATCH_SIZE
+		
+		val imageOptions = ImageOptions(File(outputDir), type, res, band, infoTechnique)
+		
+		// start a weather worker with the options
+		val weatherWorker = WeatherWorker(sleepTime, checkSleepTime, beforeDownloadTime, downloadBatchSize, imageOptions)
+		weatherWorker.run()
+		
+	}
 	
 }

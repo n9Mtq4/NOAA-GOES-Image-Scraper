@@ -31,14 +31,14 @@ internal fun parseCatalog(imageOptions: ImageOptions): ImageToDownloadList {
 	println(jsonUrl)
 	
 	val jsonStr = Jsoup
-			.connect(jsonUrl)
-			.header("Accept-Encoding", "gzip, deflate, br")
-			.userAgent(USER_AGENT)
-			.ignoreContentType(true)
-			.timeout(3000)
-			.maxBodySize(0).ignoreHttpErrors(true).followRedirects(true)
-			.execute()
-			.body()
+		.connect(jsonUrl)
+		.header("Accept-Encoding", "gzip, deflate, br")
+		.userAgent(USER_AGENT)
+		.ignoreContentType(true)
+		.timeout(3000)
+		.maxBodySize(0).ignoreHttpErrors(true).followRedirects(true)
+		.execute()
+		.body()
 	
 	val parser = JSONParser()
 	val json: JSONObject = parser.parse(jsonStr) as JSONObject

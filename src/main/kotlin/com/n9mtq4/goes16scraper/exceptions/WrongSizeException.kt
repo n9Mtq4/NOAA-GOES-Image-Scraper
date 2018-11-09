@@ -5,4 +5,5 @@ package com.n9mtq4.goes16scraper.exceptions
  *
  * @author Will "n9Mtq4" Bresnahan
  */
-class WrongSizeException(imageName: String, expectedSize: Long, actualSize: Long) : Exception("$imageName file size is wrong. Expected $expectedSize, got: $actualSize")
+class WrongSizeException(imageName: String, expectedSize: Long, actualSize: Long) :
+	Exception("$imageName file size is wrong. Expected $expectedSize, got: $actualSize")

@@ -25,7 +25,13 @@ import java.util.concurrent.atomic.AtomicInteger
  * @author Will "n9Mtq4" Bresnahan
  */
 
-class WeatherWorker(private val sleepTime: Long, private val checkSleepTime: Long, private val beforeDownloadTime: Long, private val downloadBatchSize: Int, private val imageOptions: ImageOptions) : Runnable {
+class WeatherWorker(
+	private val sleepTime: Long,
+	private val checkSleepTime: Long,
+	private val beforeDownloadTime: Long,
+	private val downloadBatchSize: Int,
+	private val imageOptions: ImageOptions
+) : Runnable {
 	
 	var ticks = 0
 	var running = true
@@ -77,7 +83,7 @@ class WeatherWorker(private val sleepTime: Long, private val checkSleepTime: Lon
 		
 		try {
 			
-			val imageUrlList = when(imageOptions.infoTechnique) {
+			val imageUrlList = when (imageOptions.infoTechnique) {
 				"catalog" -> parseCatalog(imageOptions)
 				"directorylist" -> parseDirectoryList(imageOptions)
 				"directorylistsize" -> parseDirectoryListSize(imageOptions)
@@ -102,7 +108,7 @@ class WeatherWorker(private val sleepTime: Long, private val checkSleepTime: Lon
 		
 	}
 	
-	private fun downloadAll(imageUrls: ImageToDownloadList) { 
+	private fun downloadAll(imageUrls: ImageToDownloadList) {
 		
 		val totalSize = imageUrls.size
 		val failed = AtomicInteger(0)
@@ -111,21 +117,23 @@ class WeatherWorker(private val sleepTime: Long, private val checkSleepTime: Lon
 		
 		runBlocking(context = coroutineDispatcher) {
 			
-			imagesToDownload.map { imageToDownload -> launch(context = coroutineDispatcher) {
-				
-				try {
-					downloadImage(imageToDownload)
-				}catch (e: Exception) {
+			imagesToDownload.map { imageToDownload ->
+				launch(context = coroutineDispatcher) {
 					
-					when (e) {
-						is WrongSizeException -> println(e.message)
-						else -> e.printStackTrace()
+					try {
+						downloadImage(imageToDownload)
+					} catch (e: Exception) {
+						
+						when (e) {
+							is WrongSizeException -> println(e.message)
+							else -> e.printStackTrace()
+						}
+						
+						failed.incrementAndGet()
 					}
 					
-					failed.incrementAndGet()
 				}
-				
-			} }.forEach { it.join() }
+			}.forEach { it.join() }
 			
 		}
 		
@@ -213,7 +221,7 @@ class WeatherWorker(private val sleepTime: Long, private val checkSleepTime: Lon
 					}
 				}
 			}
-		}catch (e: Exception) {
+		} catch (e: Exception) {
 			exception = e
 		}
 		
