@@ -7,14 +7,15 @@ import com.n9mtq4.goes16scraper.webparser.USER_AGENT
 import com.n9mtq4.goes16scraper.webparser.parseCatalog
 import com.n9mtq4.goes16scraper.webparser.parseDirectoryList
 import com.n9mtq4.goes16scraper.webparser.parseDirectoryListSize
-import kotlinx.coroutines.experimental.asCoroutineDispatcher
-import kotlinx.coroutines.experimental.launch
-import kotlinx.coroutines.experimental.runBlocking
+import kotlinx.coroutines.asCoroutineDispatcher
+import kotlinx.coroutines.launch
+import kotlinx.coroutines.runBlocking
 import java.io.File
 import java.io.FileOutputStream
 import java.net.HttpURLConnection
 import java.net.URL
 import java.nio.channels.Channels
+import java.util.concurrent.ExecutorService
 import java.util.concurrent.Executors
 import java.util.concurrent.atomic.AtomicInteger
 
@@ -30,8 +31,8 @@ class WeatherWorker(private val sleepTime: Long, private val checkSleepTime: Lon
 	var running = true
 	var targetTime = System.currentTimeMillis()
 	
-	val executorService = Executors.newFixedThreadPool(downloadBatchSize)
-	val coroutineDispatcher = executorService.asCoroutineDispatcher()
+	private val executorService: ExecutorService = Executors.newFixedThreadPool(downloadBatchSize)
+	private val coroutineDispatcher = executorService.asCoroutineDispatcher()
 	
 	override fun run() {
 		

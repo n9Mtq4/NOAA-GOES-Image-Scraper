@@ -144,3 +144,5 @@ gradle-app.setting
 imgs
 miscdata
 miscdata/*
+
+*.iml
