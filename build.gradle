@@ -1,3 +1,5 @@
+import proguard.gradle.ProGuardTask
+
 buildscript {
     ext.kotlin_version = '1.3.0'
     
@@ -51,14 +53,15 @@ compileTestKotlin {
 shadowJar {
     exclude 'LICENSE.txt'
     exclude '**/*.kotlin_metadata'
+    exclude '**/*.kotlin_builtins'
     dependencies {
-        exclude(dependency {
-            it.moduleGroup == 'junit'
-        })
+        exclude(dependency(':junit'))
+        exclude(dependency('org.hamcrest:'))
+        exclude(dependency(':hamcrest-core'))
     }
 }
 
-task proguard(type: proguard.gradle.ProGuardTask) {
+task proguard(type: ProGuardTask) {
     
     configuration 'proguard.txt'
     
