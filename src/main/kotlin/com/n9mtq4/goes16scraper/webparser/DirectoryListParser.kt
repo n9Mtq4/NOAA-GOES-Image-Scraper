@@ -30,10 +30,12 @@ internal fun parseDirectoryList(imageOptions: ImageOptions): ImageToDownloadList
 	
 	val imgUrlList = dListDom
 		.select(LINK_SELECTOR)
+		.asSequence()
 		.map { it.text() }
 		.filter { imageOptions.res in it }
 		.filter { "GOES16" in it }
 		.map { ImageToDownload(it, urlStr + it) }
+		.toList()
 	
 	return imgUrlList
 	
