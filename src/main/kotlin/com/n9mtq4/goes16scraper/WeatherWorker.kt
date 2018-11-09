@@ -207,20 +207,26 @@ class WeatherWorker(
 		var exception: Exception? = null
 		
 		try {
+			
 			val url = URL(imageUrl)
-			val urlConnection = url.openConnection() as HttpURLConnection
-			urlConnection.requestMethod = "GET"
-			urlConnection.connectTimeout = CONNECTION_TIMEOUT_MS
-			urlConnection.readTimeout = READ_TIMEOUT_MS
-			urlConnection.setRequestProperty("User-Agent", USER_AGENT)
-			urlConnection.inputStream.use { urlInputStream ->
+			(url.openConnection() as HttpURLConnection).apply {
+				
+				requestMethod = "GET"
+				connectTimeout = CONNECTION_TIMEOUT_MS
+				readTimeout = READ_TIMEOUT_MS
+				setRequestProperty("User-Agent", USER_AGENT)
+				
+			}.inputStream.use { urlInputStream ->
+				
 				Channels.newChannel(urlInputStream).use { rbc ->
 					FileOutputStream(targetFile).use { fos ->
 						fos.channel.transferFrom(rbc, 0, Long.MAX_VALUE)
 						// println("$imageName: HTTP ${urlConnection.responseCode}")
 					}
 				}
+				
 			}
+			
 		} catch (e: Exception) {
 			exception = e
 		}
