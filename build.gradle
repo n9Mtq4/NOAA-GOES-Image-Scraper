@@ -16,7 +16,7 @@ buildscript {
 }
 
 group 'NOAA-Goes-16-Image-Scraper'
-version '1.0-SNAPSHOT'
+version '1.1-SNAPSHOT'
 
 apply plugin: 'java'
 apply plugin: 'kotlin'
