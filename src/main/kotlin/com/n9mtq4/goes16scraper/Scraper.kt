@@ -19,7 +19,7 @@ fun main(args: Array<String>) {
 	val options = Options().apply {
 		
 		addOption("o", "output", true, "selects the output directory for the images ($DEFAULT_OUTPUT_DIRECTORY)")
-		addOption("s", "satellite", true, "the satellite (run --satellites for list of satellites) ($DEFAULT_TYPE)")
+		addOption("s", "satellite", true, "the satellite (run --satellites for list of satellites) ($DEFAULT_SATELLITE)")
 		addOption("t", "type", true, "the type of image (run --types for list of types) ($DEFAULT_TYPE)")
 		addOption("r", "resolution", true, "selects the image resolution to download (run --resolutions for list of resolutions) ($DEFAULT_RESOLUTION)")
 		addOption("b", "band", true, "selects the color/band  (run --bands for list of types) ($DEFAULT_BAND)")
