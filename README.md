@@ -1,11 +1,11 @@
-# NOAA GOES-East (GOES-16) Image Scraper
+# NOAA GOES (GOES-16, GOES-17) Image Scraper
 
 ## About
 This is a tiny program that scrapes and downloads images from 
-NOAA's GOES East satellite. As of December 18, 2017, GOES-13 has
+NOAA's GOES East or West satellites. As of December 18, 2017, GOES-13 has
 been retired from the GOES east position and been replaced with
 GOES-16. This program is an updated version of [GOES-13](https://github.com/n9Mtq4/NOAA-Goes-13-image-scraper)
-that works with GOES-16.
+that works with GOES-16 and GOES-17.
 The point of this project is to be able to keep a locally
 stored database of these images, so you can look back further than
 the image limit of the online directory list.
@@ -28,11 +28,11 @@ NOAA's site with the images can be found [here](https://www.star.nesdis.noaa.gov
                                  them (600000)
     --checksleeptime <arg>       the time (ms) between checking if sleep
                                  time has passed (600000)
-    --downloadBatchSize <arg>    the number of images to download at the
+    --downloadbatchsize <arg>    the number of images to download at the
                                  same time (4)
     --help                       prints this help message
     --infotechnique <arg>        the strategy for gaining information on
-                                 images (catalog)
+                                 images (directorylist)
     --infotechniques             prints a list of strategies for gaining
                                  information on images
  -o,--output <arg>               selects the output directory for the
@@ -41,6 +41,9 @@ NOAA's site with the images can be found [here](https://www.star.nesdis.noaa.gov
                                  (run --resolutions for list of
                                  resolutions) (339x339)
     --resolutions                prints a list of resolutions
+ -s,--satellite <arg>            the satellite (run --satellites for list
+                                 of satellites) (GOES16)
+    --satellites                 prints a list of satellites
     --sleeptime <arg>            the time (ms) between downloading images
                                  (7200000)
  -t,--type <arg>                 the type of image (run --types for list
@@ -95,6 +98,13 @@ Resolutions     Bands
 300x300         all
 600x600         all
 1200x1200       GeoColor, 1-3, 5
+```
+
+#### Satellites
+```
+Satellite           Description
+GOES16              GOES-16 / GOES-East
+GOES17              GOES-17 / GOES-West
 ```
 
 #### Types
