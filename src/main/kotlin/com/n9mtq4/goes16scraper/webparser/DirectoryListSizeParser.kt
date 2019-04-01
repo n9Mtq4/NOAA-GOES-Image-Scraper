@@ -41,7 +41,7 @@ internal fun parseDirectoryListSize(imageOptions: ImageOptions): ImageToDownload
 		.filter { it.size == 4 }
 		.map { it[0] to it[3].toLong() }
 		.filter { (name, _) -> imageOptions.res in name }
-		.filter { (name, _) -> "GOES16" in name }
+		.filter { (name, _) -> imageOptions.satellite in name }
 		.map { (name, size) -> ImageToDownload(name, urlStr + name, size) }
 		.toList()
 	

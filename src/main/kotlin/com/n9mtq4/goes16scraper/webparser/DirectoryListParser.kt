@@ -33,7 +33,7 @@ internal fun parseDirectoryList(imageOptions: ImageOptions): ImageToDownloadList
 		.asSequence()
 		.map { it.text() }
 		.filter { imageOptions.res in it }
-		.filter { "GOES16" in it }
+		.filter { imageOptions.satellite in it }
 		.map { ImageToDownload(it, urlStr + it) }
 		.toList()
 	
