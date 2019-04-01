@@ -1,5 +1,6 @@
 package com.n9mtq4.goes16scraper.webparser
 
+import com.n9mtq4.goes16scraper.CONNECTION_TIMEOUT_MS
 import com.n9mtq4.goes16scraper.ImageOptions
 import com.n9mtq4.goes16scraper.ImageToDownload
 import com.n9mtq4.goes16scraper.ImageToDownloadList
@@ -36,7 +37,7 @@ internal fun parseCatalog(imageOptions: ImageOptions): ImageToDownloadList {
 		.header("Accept-Encoding", "gzip, deflate, br")
 		.userAgent(USER_AGENT)
 		.ignoreContentType(true)
-		.timeout(3000)
+		.timeout(CONNECTION_TIMEOUT_MS)
 		.maxBodySize(0)
 		.ignoreHttpErrors(true)
 		.followRedirects(true)
