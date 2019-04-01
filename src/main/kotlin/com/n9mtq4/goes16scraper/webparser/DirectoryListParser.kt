@@ -16,7 +16,7 @@ private const val LINK_SELECTOR = "body > pre > a"
 
 internal fun parseDirectoryList(imageOptions: ImageOptions): ImageToDownloadList {
 	
-	val urlStr = "$ROOT_URL${imageOptions.type}/${imageOptions.band}/"
+	val urlStr = getNoaaUrlStr(imageOptions)
 	
 	val dListDom = Jsoup
 		.connect(urlStr)

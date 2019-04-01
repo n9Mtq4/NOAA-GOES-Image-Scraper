@@ -19,6 +19,7 @@ fun main(args: Array<String>) {
 	val options = Options().apply {
 		
 		addOption("o", "output", true, "selects the output directory for the images ($DEFAULT_OUTPUT_DIRECTORY)")
+		addOption("s", "satellite", true, "the satellite (run --satellites for list of satellites) ($DEFAULT_TYPE)")
 		addOption("t", "type", true, "the type of image (run --types for list of types) ($DEFAULT_TYPE)")
 		addOption("r", "resolution", true, "selects the image resolution to download (run --resolutions for list of resolutions) ($DEFAULT_RESOLUTION)")
 		addOption("b", "band", true, "selects the color/band  (run --bands for list of types) ($DEFAULT_BAND)")
@@ -27,6 +28,7 @@ fun main(args: Array<String>) {
 		addOption(null, "beforedownloadtime", true, "the time (ms) between downloading the list of images and actually downloading them ($DEFAULT_SLEEP_TIME_BEFORE_DOWNLOAD)")
 		addOption(null, "downloadbatchsize", true, "the number of images to download at the same time ($DEFAULT_DOWNLOAD_BATCH_SIZE)")
 		addOption(null, "infotechnique", true, "the strategy for gaining information on images ($DEFAULT_INFOTECHNIQUE)")
+		addOption(null, "satellites", false, "prints a list of satellites")
 		addOption(null, "types", false, "prints a list of types")
 		addOption(null, "resolutions", false, "prints a list of resolutions")
 		addOption(null, "bands", false, "prints a list of bands")
@@ -47,7 +49,7 @@ fun main(args: Array<String>) {
 		return
 	}
 	// lists of things
-	val helpList = listOf("types", "resolutions", "bands", "infotechniques")
+	val helpList = listOf("satellites", "types", "resolutions", "bands", "infotechniques")
 	helpList
 			.filter { cliargs.hasOption(it) }
 			.map { readFromJar("/text/$it.txt") }
@@ -58,7 +60,8 @@ fun main(args: Array<String>) {
 	cliargs.run {
 		
 		val outputDir = getOptionValue("output") ?: DEFAULT_OUTPUT_DIRECTORY
-		val type = getOptionValue("types") ?: DEFAULT_TYPE
+		val satellite = getOptionValue("satellite") ?: DEFAULT_SATELLITE
+		val type = getOptionValue("type") ?: DEFAULT_TYPE
 		val res = getOptionValue("resolution") ?: DEFAULT_RESOLUTION
 		val band = getOptionValue("band") ?: DEFAULT_BAND
 		val infoTechnique = getOptionValue("infotechnique") ?: DEFAULT_INFOTECHNIQUE
@@ -67,7 +70,7 @@ fun main(args: Array<String>) {
 		val beforeDownloadTime = getOptionValue("beforedownloadtime")?.toLong() ?: DEFAULT_SLEEP_TIME_BEFORE_DOWNLOAD
 		val downloadBatchSize = getOptionValue("downloadbatchsize")?.toInt() ?: DEFAULT_DOWNLOAD_BATCH_SIZE
 		
-		val imageOptions = ImageOptions(File(outputDir), type, res, band, infoTechnique)
+		val imageOptions = ImageOptions(File(outputDir), satellite, type, res, band, infoTechnique)
 		
 		// start a weather worker with the options
 		val weatherWorker = WeatherWorker(sleepTime, checkSleepTime, beforeDownloadTime, downloadBatchSize, imageOptions)

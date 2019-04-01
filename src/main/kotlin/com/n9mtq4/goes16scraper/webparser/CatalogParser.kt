@@ -26,7 +26,8 @@ import org.jsoup.Jsoup
  * */
 internal fun parseCatalog(imageOptions: ImageOptions): ImageToDownloadList {
 	
-	val urlStr = "$ROOT_URL${imageOptions.type}/${imageOptions.band}/"
+	val urlStr = getNoaaUrlStr(imageOptions)
+	
 	val jsonUrl = urlStr + "catalog.json"
 	println(jsonUrl)
 	
@@ -36,7 +37,9 @@ internal fun parseCatalog(imageOptions: ImageOptions): ImageToDownloadList {
 		.userAgent(USER_AGENT)
 		.ignoreContentType(true)
 		.timeout(3000)
-		.maxBodySize(0).ignoreHttpErrors(true).followRedirects(true)
+		.maxBodySize(0)
+		.ignoreHttpErrors(true)
+		.followRedirects(true)
 		.execute()
 		.body()
 	

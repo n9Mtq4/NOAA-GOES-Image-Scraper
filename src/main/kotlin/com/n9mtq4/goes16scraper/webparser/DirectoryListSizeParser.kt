@@ -17,7 +17,7 @@ private const val SPACE_REGEX_STRING = "\\s+"
 
 internal fun parseDirectoryListSize(imageOptions: ImageOptions): ImageToDownloadList {
 	
-	val urlStr = "$ROOT_URL${imageOptions.type}/${imageOptions.band}/"
+	val urlStr = getNoaaUrlStr(imageOptions)
 	
 	val dListDom = Jsoup
 		.connect(urlStr)

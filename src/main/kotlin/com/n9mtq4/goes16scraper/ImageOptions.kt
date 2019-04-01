@@ -9,6 +9,7 @@ import java.io.File
  */
 data class ImageOptions(
 	var outputDir: File,
+	var satellite: String,
 	var type: String,
 	var res: String,
 	var band: String,
@@ -17,6 +18,7 @@ data class ImageOptions(
 	
 	fun sanitize() {
 		// make sure that the number is two chars or its uppercase
+		satellite = satellite.toUpperCase()
 		band = (band.toIntOrNull()?.toString()?.padStart(2, '0') ?: band).toUpperCase()
 	}
 	

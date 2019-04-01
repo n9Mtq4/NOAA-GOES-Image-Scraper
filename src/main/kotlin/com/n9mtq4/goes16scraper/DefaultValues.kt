@@ -11,6 +11,7 @@ const val READ_TIMEOUT_MS = CONNECTION_TIMEOUT_MS * 10 // 10 times connection ti
 
 const val DEFAULT_OUTPUT_DIRECTORY = "imgs/"
 
+const val DEFAULT_SATELLITE = "GOES16"
 const val DEFAULT_TYPE = "FD"
 const val DEFAULT_BAND = "GeoColor"
 const val DEFAULT_RESOLUTION = "339x339"

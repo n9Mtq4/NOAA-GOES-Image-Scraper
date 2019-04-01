@@ -1,0 +1,5 @@
+Types of satellites
+
+Satellite           Description
+GOES16              GOES-16 / GOES-East
+GOES17              GOES-17 / GOES-West
