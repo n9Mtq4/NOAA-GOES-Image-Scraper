@@ -5,7 +5,7 @@ plugins {
 }
 
 group = 'NOAA-Goes-16-Image-Scraper'
-version = '1.1-SNAPSHOT'
+version = '1.2-SNAPSHOT'
 mainClassName = "com.n9mtq4.goes16scraper.ScraperKt"
 
 repositories {

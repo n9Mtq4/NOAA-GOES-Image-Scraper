@@ -11,7 +11,7 @@ import com.n9mtq4.goes16scraper.ImageOptions
 const val ROOT_URL = "https://cdn.star.nesdis.noaa.gov/"
 const val POST_ROOT_URL = "/ABI/"
 
-const val USER_AGENT = "n9Mtq4-goes-east-scrapper/0.3 (+https://github.com/n9Mtq4/NOAA-Goes-16-image-scraper)"
+const val USER_AGENT = "n9Mtq4-goes-east-scrapper/1.2 (+https://github.com/n9Mtq4/NOAA-Goes-16-image-scraper)"
 
 fun getNoaaUrlStr(imageOptions: ImageOptions): String {
 	return "$ROOT_URL/${imageOptions.satellite}/$POST_ROOT_URL${imageOptions.type}/${imageOptions.band}/"
