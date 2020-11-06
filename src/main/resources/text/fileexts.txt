@@ -1,0 +1,4 @@
+Possible values for bands
+
+jpg
+tif

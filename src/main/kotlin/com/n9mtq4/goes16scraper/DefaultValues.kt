@@ -16,6 +16,7 @@ const val DEFAULT_TYPE = "FD"
 const val DEFAULT_BAND = "GeoColor"
 const val DEFAULT_RESOLUTION = "339x339"
 const val DEFAULT_INFOTECHNIQUE = "directorylist"
+const val DEFAULT_FILEEXT = "jpg"
 
 const val DEFAULT_SLEEP_TIME: Long = 1000 * 60 * 60 * 2 // 2 hour sleep time (4 hours default)
 const val DEFAULT_CHECK_SLEEP_TIME: Long = DEFAULT_SLEEP_TIME / 12 // accuracy of target time is 1/12th of the original sleep time

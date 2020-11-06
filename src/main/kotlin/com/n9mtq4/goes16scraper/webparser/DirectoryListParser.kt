@@ -34,6 +34,7 @@ internal fun parseDirectoryList(imageOptions: ImageOptions): ImageToDownloadList
 		.map { it.text() }
 		.filter { imageOptions.res in it }
 		.filter { imageOptions.satellite in it }
+		.filter { it.endsWith(imageOptions.fileExt) }
 		.map { ImageToDownload(it, urlStr + it) }
 		.toList()
 	

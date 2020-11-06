@@ -13,7 +13,8 @@ data class ImageOptions(
 	var type: String,
 	var res: String,
 	var band: String,
-	var infoTechnique: String
+	var infoTechnique: String,
+	var fileExt: String
 ) {
 	
 	fun sanitize() {
